@@ -27,7 +27,7 @@ Responsibilities:
 - API → Frontend integration
 - Full 3D React Three Fiber frontend
 
-### **Irina Kiseleva **
+### **Irina Kiseleva**
 **Role:** Database & Core Backend Logic  
 Responsibilities:
 - Database schema & relations
