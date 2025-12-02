@@ -1,4 +1,4 @@
-package com.timeout.BookingSystem;
+package com.timeout.bookingsystem;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
