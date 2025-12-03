@@ -12,14 +12,14 @@ public class Plane {
 
     private String model;
 
-    private int seatsEconomy;
-    private int seatsBusiness;
-    private int seatsFirst;
+    private Integer seatsEconomy;
+    private Integer seatsBusiness;
+    private Integer seatsFirst;
 
     public Plane() {
     }
 
-    public Plane(String model, int seatsEconomy, int seatsBusiness, int seatsFirst) {
+    public Plane(String model, Integer seatsEconomy, Integer seatsBusiness, Integer seatsFirst) {
         this.model = model;
         this.seatsEconomy = seatsEconomy;
         this.seatsBusiness = seatsBusiness;
@@ -38,27 +38,27 @@ public class Plane {
         this.model = model;
     }
 
-    public int getSeatsEconomy() {
+    public Integer getSeatsEconomy() {
         return seatsEconomy;
     }
 
-    public void setSeatsEconomy(int seatsEconomy) {
+    public void setSeatsEconomy(Integer seatsEconomy) {
         this.seatsEconomy = seatsEconomy;
     }
 
-    public int getSeatsBusiness() {
+    public Integer getSeatsBusiness() {
         return seatsBusiness;
     }
 
-    public void setSeatsBusiness(int seatsBusiness) {
+    public void setSeatsBusiness(Integer seatsBusiness) {
         this.seatsBusiness = seatsBusiness;
     }
 
-    public int getSeatsFirst() {
+    public Integer getSeatsFirst() {
         return seatsFirst;
     }
 
-    public void setSeatsFirst(int seatsFirst) {
+    public void setSeatsFirst(Integer seatsFirst) {
         this.seatsFirst = seatsFirst;
     }
 
