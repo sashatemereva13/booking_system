@@ -4,6 +4,7 @@ import com.timeout.bookingsystem.models.Flight;
 import com.timeout.bookingsystem.services.FlightService;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -25,5 +26,13 @@ public class FlightController {
     @PostMapping
     public Flight addFlight(@RequestBody Flight flight) {
         return flightService.createFlight(flight);
+    }
+
+    @GetMapping("/search")
+    public List<Flight> searchFlights(@RequestParam Long departureId,
+                                      @RequestParam Long arrivalId,
+                                      @RequestParam(required = false) String date) {
+        return flightService.searchFlights(departureId, arrivalId,
+                date != null ? LocalDate.parse(date) : null);
     }
 }

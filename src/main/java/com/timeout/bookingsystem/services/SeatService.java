@@ -55,7 +55,7 @@ public class SeatService {
         Seat seat = seatRepository.findById(seatId).orElseThrow(() -> new RuntimeException("Seat not found"));
 
         if (seat.isOccupied()) {
-            throw new RuntimeException("Seat is already occupied");
+            throw new RuntimeException("Seat " + seat.getSeatNumber() + " is already occupied.");
         }
 
         seat.setOccupied(true);

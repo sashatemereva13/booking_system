@@ -10,6 +10,8 @@ import com.timeout.bookingsystem.repositories.PlaneRepository;
 
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -51,5 +53,23 @@ public class FlightService {
 
         // --- Save the flight ---
         return flightRepository.save(flight);
+    }
+
+    public List<Flight> searchFlights(Long depId, Long arrId, LocalDate date) {
+
+        Airport departure = airportRepository.findById(depId).orElseThrow(() -> new RuntimeException("Airport not found"));
+
+        Airport arrival = airportRepository.findById(arrId).orElseThrow(() -> new RuntimeException("Airport not found"));
+
+        if (date == null) {
+            return flightRepository.findByDepartureAirportAndArrivalAirport(departure, arrival);
+        }
+
+        LocalDateTime start = date.atStartOfDay();
+        LocalDateTime end = date.plusDays(1).atStartOfDay();
+
+        return flightRepository.findByDepartureAirportAndArrivalAirportAndDepartureTimeBetween(
+                departure, arrival,start, end
+        );
     }
 }

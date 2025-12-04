@@ -1,7 +1,9 @@
 package com.timeout.bookingsystem.controllers;
 
+import com.timeout.bookingsystem.exceptions.SeatUnavailableException;
 import com.timeout.bookingsystem.models.Seat;
 import com.timeout.bookingsystem.services.SeatService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,5 +47,11 @@ public class SeatController {
     @GetMapping("/plane/{planeId}/occupied")
     public List<Seat> getOccupiedSeats(@PathVariable Long planeId) {
         return seatService.getOccupiedSeats(planeId);
+    }
+
+    @ExceptionHandler(SeatUnavailableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleSeatUnavailable(SeatUnavailableException ex) {
+        return ex.getMessage();
     }
 }
