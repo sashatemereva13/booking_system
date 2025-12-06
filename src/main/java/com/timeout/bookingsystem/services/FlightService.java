@@ -1,20 +1,19 @@
 package com.timeout.bookingsystem.services;
 
 import com.timeout.bookingsystem.dto.FlightSearchResponse;
-import com.timeout.bookingsystem.models.Airport;
-import com.timeout.bookingsystem.models.Flight;
-import com.timeout.bookingsystem.models.Plane;
-import com.timeout.bookingsystem.models.Seats;
-import com.timeout.bookingsystem.models.Seat;
+import com.timeout.bookingsystem.dto.SeatResponse;
+import com.timeout.bookingsystem.models.*;
 
 import com.timeout.bookingsystem.repositories.AirportRepository;
 import com.timeout.bookingsystem.repositories.FlightRepository;
+import com.timeout.bookingsystem.repositories.FlightSeatRepository;
 import com.timeout.bookingsystem.repositories.PlaneRepository;
 
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -26,13 +25,16 @@ public class FlightService {
     private final FlightRepository flightRepository;
     private final AirportRepository airportRepository;
     private final PlaneRepository planeRepository;
+    private final FlightSeatRepository flightSeatRepository;
 
     public FlightService(FlightRepository flightRepository,
                          AirportRepository airportRepository,
-                         PlaneRepository planeRepository) {
+                         PlaneRepository planeRepository,
+                         FlightSeatRepository flightSeatRepository) {
         this.flightRepository = flightRepository;
         this.airportRepository = airportRepository;
         this.planeRepository = planeRepository;
+        this.flightSeatRepository = flightSeatRepository;
     }
 
     public List<Flight> getAllFlights() {
@@ -41,7 +43,7 @@ public class FlightService {
 
     public Flight createFlight(Flight flight) {
 
-        // --- Loaf real entities from DB ---
+        // --- Load real entities from DB ---
         Airport departureAirport = airportRepository.findById(flight.getDepartureAirport().getId()).orElseThrow(() -> new RuntimeException("Departure airport not found"));
 
         Airport arrivalAirport = airportRepository.findById(
@@ -57,10 +59,40 @@ public class FlightService {
         flight.setArrivalAirport(arrivalAirport);
         flight.setPlane(plane);
 
-        flight.getPlane().setSeats(null);
-
         // --- Save the flight ---
         return flightRepository.save(flight);
+    }
+
+    /**
+     * Ensures that this flight has its own set of FlightSeat entries.
+     * If none exist yet, they are created based on the plane's seat layout.
+     */
+    private List<FlightSeat> initSeatsForFlightIfNeeded(Flight flight) {
+
+        List<FlightSeat> existing = flightSeatRepository.findByFlight(flight);
+        if (!existing.isEmpty()) {
+            return existing;
+        }
+
+        Plane plane = flight.getPlane();
+        List<Seat> templateSeats = plane.getSeats();
+
+        if (templateSeats == null || templateSeats.isEmpty()) {
+            throw new RuntimeException("Plane had no seat layout defined");
+        }
+
+        List<FlightSeat> toSave = new ArrayList<>();
+        for (Seat s : templateSeats) {
+
+            FlightSeat fs = new FlightSeat();
+            fs.setFlight(flight);
+            fs.setSeatNumber(s.getSeatNumber());
+            fs.setSeatClass(s.getSeats());
+            fs.setOccupied(false);
+            toSave.add(fs);
+        }
+
+        return flightSeatRepository.saveAll(toSave);
     }
 
     public List<FlightSearchResponse> searchFlights(Long depId, Long arrId, LocalDate date) {
@@ -83,23 +115,30 @@ public class FlightService {
         }
 
         return flights.stream().map(flight -> {
-            int eco = (int) flight.getPlane().getSeats().stream()
-                    .filter(s -> s.getSeats() == Seats.ECONOMY && !s.isOccupied()).count();
 
-            int bus = (int) flight.getPlane().getSeats().stream()
-                    .filter(s -> s.getSeats() == Seats.BUSINESS && !s.isOccupied()).count();
+            // make sure this flight has the FlightSeat rows
+            List<FlightSeat> flightSeats = initSeatsForFlightIfNeeded(flight);
 
-            int fir = (int) flight.getPlane().getSeats().stream()
-                    .filter(s -> s.getSeats() == Seats.FIRST && !s.isOccupied()).count();
+            int eco = (int) flightSeats.stream()
+                    .filter(s -> s.getSeatClass() == Seats.ECONOMY && !s.isOccupied()).count();
+
+            int bus = (int) flightSeats.stream()
+                    .filter(s -> s.getSeatClass() == Seats.BUSINESS && !s.isOccupied()).count();
+
+            int fir = (int) flightSeats.stream()
+                    .filter(s -> s.getSeatClass() == Seats.FIRST && !s.isOccupied()).count();
 
 
             return new FlightSearchResponse(
                     flight.getId(),
                     flight.getFlightNumber(),
+
                     flight.getDepartureAirport().getCityAirport(),
                     flight.getArrivalAirport().getCityAirport(),
-                    flight.getDepartureTime().toString(),
-                    flight.getArrivalTime().toString(),
+
+                    flight.getDepartureTime() != null ? flight.getDepartureTime().toString() : null,
+                    flight.getArrivalTime() != null ? flight.getArrivalTime().toString() : null,
+
                     eco, bus, fir,
 
                     flight.getPriceEconomy(),
@@ -115,26 +154,88 @@ public class FlightService {
         Flight flight = flightRepository.findById(flightId)
                 .orElseThrow(() -> new RuntimeException("Flight not found"));
 
-        List<Seat> seats = flight.getPlane().getSeats();
+        List<FlightSeat> flightSeats = initSeatsForFlightIfNeeded(flight);
 
         Map<String, List<String>> result = new HashMap<>();
-        result.put("economy", seats.stream()
-                .filter(s -> s.getSeats() == Seats.ECONOMY && !s.isOccupied())
-                .map(Seat::getSeatNumber)
+        result.put("economy", flightSeats.stream()
+                .filter(s -> s.getSeatClass() == Seats.ECONOMY && !s.isOccupied())
+                .map(FlightSeat::getSeatNumber)
                 .toList());
-        result.put("business", seats.stream()
-                .filter(s -> s.getSeats() == Seats.BUSINESS && !s.isOccupied())
-                .map(Seat::getSeatNumber)
+        result.put("business", flightSeats.stream()
+                .filter(s -> s.getSeatClass() == Seats.BUSINESS && !s.isOccupied())
+                .map(FlightSeat::getSeatNumber)
                 .toList());
 
-        result.put("first", seats.stream()
-                .filter(s -> s.getSeats() == Seats.FIRST && !s.isOccupied())
-                .map(Seat::getSeatNumber)
+        result.put("first", flightSeats.stream()
+                .filter(s -> s.getSeatClass() == Seats.FIRST && !s.isOccupied())
+                .map(FlightSeat::getSeatNumber)
                 .toList());
 
         return result;
     }
 
+    public List<SeatResponse> getAllSeatsResponse(Long flightId) {
+        Flight flight = flightRepository.findById(flightId)
+                .orElseThrow(() -> new RuntimeException("Flight not found"));
 
+        List<FlightSeat> seats = initSeatsForFlightIfNeeded(flight);
 
-}
+        return seats.stream().map(s -> {
+
+            double price = switch (s.getSeatClass()) {
+                case ECONOMY -> flight.getPriceEconomy();
+                case BUSINESS -> flight.getPriceBusiness();
+                case FIRST -> flight.getPriceFirst();
+            };
+
+            return new SeatResponse(
+                    s.getId(),
+                    s.getSeatNumber(),
+                    s.getSeatClass().name(),
+                    s.isOccupied(),
+                    price
+
+            );
+        }).toList();
+    }
+
+    public List<SeatResponse> getAvailableSeatsResponse(Long flightId) {
+        return getAllSeatsResponse(flightId).stream()
+                .filter(s -> !s.occupied())
+                .toList();
+    }
+
+    public List<SeatResponse> getSeatsFiltered(Long flightId, String seatClass, Boolean available) {
+
+        Flight flight = flightRepository.findById(flightId).orElseThrow(() -> new RuntimeException("Flight not found"));
+
+        List<FlightSeat> seats = initSeatsForFlightIfNeeded(flight);
+
+        return seats.stream()
+
+                //filter by class if provided
+                .filter(s -> seatClass == null || s.getSeatClass().name().equals(seatClass))
+
+                // filter by availability if provided
+                .filter(s -> available == null || (!s.isOccupied() == available))
+
+                .map(s -> {
+
+                    // determine price based on seat class
+                    double price = switch (s.getSeatClass()) {
+                        case ECONOMY -> flight.getPriceEconomy();
+                        case BUSINESS -> flight.getPriceBusiness();
+                        case FIRST -> flight.getPriceFirst();
+                    };
+
+                    return new SeatResponse(
+                            s.getId(),
+                            s.getSeatNumber(),
+                            s.getSeatClass().name(),
+                            s.isOccupied(),
+                            price
+                    );
+                })
+
+                .toList();
+    }}

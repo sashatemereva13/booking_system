@@ -14,43 +14,56 @@ public class BookingService {
 
     private final BookingRepository bookingRepository;
     private final FlightRepository flightRepository;
-    private final SeatRepository seatRepository;
+    private final FlightSeatRepository flightSeatRepository;
+    private final ClientRepository clientRepository;
 
     public BookingService(BookingRepository bookingRepository,
                           FlightRepository flightRepository,
-                          SeatRepository seatRepository) {
+                          FlightSeatRepository flightSeatRepository,
+                          ClientRepository clientRepository) {
         this.bookingRepository = bookingRepository;
         this.flightRepository = flightRepository;
-        this.seatRepository = seatRepository;
+        this.flightSeatRepository = flightSeatRepository;
+        this.clientRepository = clientRepository;
     }
 
     public BookingResponse createBooking(Long flightId,
                                  Long seatId,
-                                 String passengerName,
+                                 String passengerFirstName,
+                                 String passengerLastName,
                                  String email) {
+
 
         Flight flight = flightRepository.findById(flightId).orElseThrow(() -> new RuntimeException("flight not found"));
 
-        Seat seat = seatRepository.findById(seatId).orElseThrow(() -> new RuntimeException("seat not found"));
+        FlightSeat seat = flightSeatRepository.findById(seatId).orElseThrow(() -> new RuntimeException("seat not found"));
 
         if (seat.isOccupied()) {
             throw new SeatUnavailableException("Seat " + seat.getSeatNumber() + " is already booked.");
         }
 
         // determine the price
-        double price;
-        switch (seat.getSeats()) {
-            case ECONOMY -> price = flight.getPriceEconomy();
-            case BUSINESS -> price = flight.getPriceBusiness();
-            case FIRST -> price = flight.getPriceFirst();
-            default -> throw new RuntimeException("Unknown seat type");
-        }
+        double price = switch (seat.getSeatClass()) {
+            case ECONOMY -> flight.getPriceEconomy();
+            case BUSINESS -> flight.getPriceBusiness();
+            case FIRST -> flight.getPriceFirst();
+        };
+
+
 
         seat.setOccupied(true);
-        seatRepository.save(seat);
+        flightSeatRepository.save(seat);
 
-        Booking booking = new Booking(passengerName, email, flight, seat);
+        Booking booking = new Booking(passengerFirstName, passengerLastName, email, flight, seat);
         booking.setPricePaid(price);
+        bookingRepository.save(booking);
+
+        // find or create Client
+        Client client = clientRepository.findByEmail(email).orElseGet(() -> clientRepository.save(new Client(passengerFirstName, passengerLastName, email)));
+
+        int milesEarned = (int)(price * 5);
+        client.addMiles(milesEarned);
+        clientRepository.save(client);
 
         return toResponse(booking);
     }
@@ -59,9 +72,9 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new RuntimeException("booking not found"));
 
         // free the seat
-        Seat seat = booking.getSeat();
+        FlightSeat seat = booking.getSeat();
         seat.setOccupied(false);
-        seatRepository.save(seat);
+        flightSeatRepository.save(seat);
 
         // delete the record
         bookingRepository.delete(booking);
@@ -80,14 +93,27 @@ public class BookingService {
         return toResponse(booking);
     }
 
+    public int getMilesByEmail(String email) {
+        return clientRepository.findByEmail(email).map(Client::getMiles).orElse(0);
+    }
+
     private BookingResponse toResponse(Booking booking) {
+
+        // find client to read miles
+        Client client = clientRepository.findByEmail(booking.getPassengerEmail())
+                .orElse(null);
+
+        Integer miles = (client != null) ? client.getMiles() : 0;
+
         return new BookingResponse(
                 booking.getId(),
-                booking.getPassengerName(),
+                booking.getPassengerFirstName(),
+                booking.getPassengerLastName(),
                 booking.getPassengerEmail(),
                 booking.getFlight().getFlightNumber(),
                 booking.getSeat().getSeatNumber(),
-                booking.getPricePaid()
+                booking.getPricePaid(),
+                miles
         );
     }
 

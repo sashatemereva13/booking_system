@@ -13,16 +13,17 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String passengerName;
+    private String passengerFirstName;
+    private String passengerLastName;
     private String passengerEmail;
 
     @ManyToOne
     @JoinColumn (name = "flight_id", nullable = false)
     private Flight flight;
 
-    @OneToOne
-    @JoinColumn (name = "seat_id", nullable = false, unique = true)
-    private Seat seat;
+    @ManyToOne
+    @JoinColumn (name = "flight_seat_id", nullable = false)
+    private FlightSeat seat;
 
     @Column(nullable = false)
     private Double pricePaid;
@@ -31,8 +32,9 @@ public class Booking {
 
     public Booking() {}
 
-    public Booking(String passengerName, String passengerEmail, Flight flight, Seat seat) {
-        this.passengerName = passengerName;
+    public Booking(String passengerFirstName, String passengerLastName, String passengerEmail, Flight flight, FlightSeat seat) {
+        this.passengerFirstName = passengerFirstName;
+        this.passengerLastName = passengerLastName;
         this.passengerEmail = passengerEmail;
         this.flight = flight;
         this.seat = seat;
@@ -41,8 +43,11 @@ public class Booking {
 
     public Long getId() {return id;}
 
-    public String getPassengerName() {return passengerName;}
-    public void setPassengerName(String passengerName) {this.passengerName = passengerName;}
+    public String getPassengerFirstName() {return passengerFirstName;}
+    public void setPassengerName(String passengerFirstName) {this.passengerFirstName = passengerFirstName;}
+
+    public String getPassengerLastName() {return passengerLastName;}
+    public void setPassengerLastName(String passengerLastName) {this.passengerLastName = passengerLastName;}
 
     public String getPassengerEmail() {return passengerEmail;}
     public void setPassengerEmail(String passengerEmail) {this.passengerEmail = passengerEmail;}
@@ -50,8 +55,8 @@ public class Booking {
     public Flight getFlight() {return flight;}
     public void setFlight(Flight flight) {this.flight = flight;}
 
-    public Seat getSeat() {return seat;}
-    public void setSeat(Seat seat) {this.seat = seat;}
+    public FlightSeat getSeat() {return seat;}
+    public void setSeat(FlightSeat seat) {this.seat = seat;}
 
     public LocalDateTime getBookedAt() {return bookingTime;}
 

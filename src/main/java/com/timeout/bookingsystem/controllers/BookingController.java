@@ -3,6 +3,7 @@ package com.timeout.bookingsystem.controllers;
 import com.timeout.bookingsystem.dto.BookingResponse;
 import com.timeout.bookingsystem.exceptions.SeatUnavailableException;
 import com.timeout.bookingsystem.models.Booking;
+import com.timeout.bookingsystem.models.Client;
 import com.timeout.bookingsystem.services.BookingService;
 
 import org.springframework.web.bind.annotation.*;
@@ -25,10 +26,11 @@ public class BookingController {
     public BookingResponse createBooking(
             @RequestParam Long flightId,
             @RequestParam Long seatId,
-            @RequestParam String name,
+            @RequestParam String passengerFirstName,
+            @RequestParam String passengerLastName,
             @RequestParam String email
     ) {
-        return bookingService.createBooking(flightId, seatId, name, email);
+        return bookingService.createBooking(flightId, seatId, passengerFirstName, passengerLastName, email);
     }
 
     @ExceptionHandler(SeatUnavailableException.class)
@@ -56,6 +58,11 @@ public class BookingController {
     @GetMapping("/{id}")
     public BookingResponse getBooking(@PathVariable Long id) {
         return bookingService.getBookingResponseById(id);
+    }
+
+    @GetMapping("/clients/miles")
+    public int getMiles(@RequestParam String email) {
+        return bookingService.getMilesByEmail(email);
     }
 
 

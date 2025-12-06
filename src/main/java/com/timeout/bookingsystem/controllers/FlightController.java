@@ -1,6 +1,7 @@
 package com.timeout.bookingsystem.controllers;
 
 import com.timeout.bookingsystem.dto.FlightSearchResponse;
+import com.timeout.bookingsystem.dto.SeatResponse;
 import com.timeout.bookingsystem.models.Flight;
 import com.timeout.bookingsystem.services.FlightService;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,16 @@ public class FlightController {
 
     public FlightController(FlightService flightService) {
         this.flightService = flightService;
+    }
+
+
+    @GetMapping("/{id}/seats")
+    public Object getSeatsByFlight(
+            @PathVariable Long id,
+            @RequestParam(required = false) String seatClass,
+            @RequestParam(required = false) Boolean available
+    ) {
+        return flightService.getSeatsFiltered(id, seatClass, available);
     }
 
     @GetMapping
@@ -38,8 +49,13 @@ public class FlightController {
                 date != null ? LocalDate.parse(date) : null);
     }
 
-    @GetMapping("/{flightId}/seats")
-    public Map<String, List<String>> getSeatsForFlight(@PathVariable Long flightId) {
-        return flightService.getSeatsForFlight(flightId);
+    @GetMapping("/{id}/seats/filter")
+    public List<SeatResponse> filterSeats(
+            @PathVariable Long id,
+            @RequestParam(required = false) String seatClass,
+            @RequestParam(required = false) Boolean available
+            ) {
+        return flightService.getSeatsFiltered(id, seatClass, available);
     }
+
 }
