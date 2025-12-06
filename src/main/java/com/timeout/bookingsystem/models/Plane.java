@@ -1,6 +1,9 @@
 package com.timeout.bookingsystem.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "planes")
@@ -16,8 +19,10 @@ public class Plane {
     private Integer seatsBusiness;
     private Integer seatsFirst;
 
-    public Plane() {
-    }
+    public Plane() {}
+
+    @OneToMany(mappedBy = "plane", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Seat> seats;
 
     public Plane(String model, Integer seatsEconomy, Integer seatsBusiness, Integer seatsFirst) {
         this.model = model;
@@ -61,5 +66,9 @@ public class Plane {
     public void setSeatsFirst(Integer seatsFirst) {
         this.seatsFirst = seatsFirst;
     }
+
+    public List<Seat> getSeats() {return seats;}
+    public void setSeats(List<Seat> seats) {this.seats = seats;}
+
 
 }

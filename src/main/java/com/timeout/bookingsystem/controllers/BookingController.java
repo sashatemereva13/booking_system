@@ -1,5 +1,6 @@
 package com.timeout.bookingsystem.controllers;
 
+import com.timeout.bookingsystem.dto.BookingResponse;
 import com.timeout.bookingsystem.exceptions.SeatUnavailableException;
 import com.timeout.bookingsystem.models.Booking;
 import com.timeout.bookingsystem.services.BookingService;
@@ -21,7 +22,7 @@ public class BookingController {
     }
 
     @PostMapping("/create")
-    public Booking createBooking(
+    public BookingResponse createBooking(
             @RequestParam Long flightId,
             @RequestParam Long seatId,
             @RequestParam String name,
@@ -42,24 +43,21 @@ public class BookingController {
         return "Booking has been cancelled. The seat is now free.";
     }
 
-    @GetMapping("/user")
-    public List<Booking> getBookingByEmail(@RequestParam String email) {
-        return bookingService.getBookingsByEmail(email);
+    @GetMapping("/email")
+    public List<BookingResponse> getBookingByEmail(@RequestParam String email) {
+        return bookingService.getBookingsByEmailResponse(email);
     }
 
-    @GetMapping List<Booking> getAllBookings() {
-        return bookingService.getAllBookings();
+    @GetMapping
+    List<BookingResponse> getAllBookings() {
+        return bookingService.getAllBookingsResponse();
     }
 
     @GetMapping("/{id}")
-    public Booking getBooking(@PathVariable Long id) {
-        return bookingService.getBookingById(id);
+    public BookingResponse getBooking(@PathVariable Long id) {
+        return bookingService.getBookingResponseById(id);
     }
 
-    @GetMapping("/by-email")
-    public List<Booking> getBookingsByEmail(@RequestParam String email) {
-        return bookingService.getBookingsByEmail(email);
-    }
 
 
 }

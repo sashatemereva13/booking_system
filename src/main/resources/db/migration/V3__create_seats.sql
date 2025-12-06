@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS seats (
+id SERIAL PRIMARY KEY,
+seat_number VARCHAR(10) NOT NULL,
+seats VARCHAR(20) NOT NULL,
+occupied BOOLEAN DEFAULT FALSE,
+plane_id INT NOT NULL,
+CONSTRAINT fk_seat_plane FOREIGN KEY (plane_id) REFERENCES planes(id)
+);

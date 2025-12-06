@@ -27,6 +27,15 @@ public class Flight {
     @JoinColumn(name = "plane_id", nullable = false)
     private Plane plane;
 
+    @Column(nullable = false)
+    private Double priceEconomy;
+
+    @Column(nullable = false)
+    private Double priceBusiness;
+
+    @Column(nullable = false)
+    private Double priceFirst;
+
     // --- DATE & TIME ---
     private LocalDateTime departureTime;
     private LocalDateTime arrivalTime;
@@ -54,6 +63,15 @@ public class Flight {
 
     public LocalDateTime getArrivalTime() {return arrivalTime;}
     public void setArrivalTime(LocalDateTime arrivalTime) {this.arrivalTime = arrivalTime;}
+
+    public Double getPriceEconomy() {return priceEconomy;}
+    public void setPriceEconomy(Double priceEconomy) {this.priceEconomy = priceEconomy;}
+
+    public Double getPriceBusiness() {return priceBusiness;}
+    public void setPriceBusiness(Double priceBusiness) {this.priceBusiness = priceBusiness;}
+
+    public Double getPriceFirst() {return priceFirst;}
+    public void setPriceFirst(Double priceFirst) {this.priceFirst = priceFirst;}
 }
 
 

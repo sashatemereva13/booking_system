@@ -21,10 +21,13 @@ public class Booking {
     private Flight flight;
 
     @OneToOne
-    @JoinColumn (name = "sear_id", nullable = false, unique = true)
+    @JoinColumn (name = "seat_id", nullable = false, unique = true)
     private Seat seat;
 
-    private LocalDateTime bookedAt = LocalDateTime.now();
+    @Column(nullable = false)
+    private Double pricePaid;
+
+    private LocalDateTime bookingTime = LocalDateTime.now();
 
     public Booking() {}
 
@@ -33,7 +36,7 @@ public class Booking {
         this.passengerEmail = passengerEmail;
         this.flight = flight;
         this.seat = seat;
-        this.bookedAt = LocalDateTime.now();
+        this.bookingTime = LocalDateTime.now();
     }
 
     public Long getId() {return id;}
@@ -50,5 +53,8 @@ public class Booking {
     public Seat getSeat() {return seat;}
     public void setSeat(Seat seat) {this.seat = seat;}
 
-    public LocalDateTime getBookedAt() {return bookedAt;}
+    public LocalDateTime getBookedAt() {return bookingTime;}
+
+    public Double getPricePaid() {return pricePaid;}
+    public void setPricePaid(Double pricePaid) {this.pricePaid = pricePaid;}
 }

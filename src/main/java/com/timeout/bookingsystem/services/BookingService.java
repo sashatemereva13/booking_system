@@ -1,5 +1,6 @@
 package com.timeout.bookingsystem.services;
 
+import com.timeout.bookingsystem.dto.BookingResponse;
 import com.timeout.bookingsystem.exceptions.SeatUnavailableException;
 import com.timeout.bookingsystem.models.*;
 import com.timeout.bookingsystem.repositories.*;
@@ -23,7 +24,7 @@ public class BookingService {
         this.seatRepository = seatRepository;
     }
 
-    public Booking createBooking(Long flightId,
+    public BookingResponse createBooking(Long flightId,
                                  Long seatId,
                                  String passengerName,
                                  String email) {
@@ -36,11 +37,22 @@ public class BookingService {
             throw new SeatUnavailableException("Seat " + seat.getSeatNumber() + " is already booked.");
         }
 
+        // determine the price
+        double price;
+        switch (seat.getSeats()) {
+            case ECONOMY -> price = flight.getPriceEconomy();
+            case BUSINESS -> price = flight.getPriceBusiness();
+            case FIRST -> price = flight.getPriceFirst();
+            default -> throw new RuntimeException("Unknown seat type");
+        }
+
         seat.setOccupied(true);
         seatRepository.save(seat);
 
         Booking booking = new Booking(passengerName, email, flight, seat);
-        return bookingRepository.save(booking);
+        booking.setPricePaid(price);
+
+        return toResponse(booking);
     }
 
     public void cancelBooking(Long bookingId) {
@@ -55,16 +67,28 @@ public class BookingService {
         bookingRepository.delete(booking);
     }
 
-    public List<Booking> getBookingsByEmail(String email) {
-        return bookingRepository.findByPassengerEmail(email);
+    public List<BookingResponse> getBookingsByEmailResponse(String email) {
+        return bookingRepository.findByPassengerEmail(email).stream().map(this::toResponse).toList();
     }
 
-    public List<Booking> getAllBookings() {
-        return bookingRepository.findAll();
+    public List<BookingResponse> getAllBookingsResponse() {
+        return bookingRepository.findAll().stream().map(this::toResponse).toList();
     }
 
-    public Booking getBookingById(Long id) {
-        return bookingRepository.findById(id).orElseThrow(() -> new RuntimeException("booking not found"));
+    public BookingResponse getBookingResponseById(Long id) {
+        Booking booking = bookingRepository.findById(id).orElseThrow(() -> new RuntimeException("booking not found"));
+        return toResponse(booking);
+    }
+
+    private BookingResponse toResponse(Booking booking) {
+        return new BookingResponse(
+                booking.getId(),
+                booking.getPassengerName(),
+                booking.getPassengerEmail(),
+                booking.getFlight().getFlightNumber(),
+                booking.getSeat().getSeatNumber(),
+                booking.getPricePaid()
+        );
     }
 
 }

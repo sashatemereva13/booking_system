@@ -11,14 +11,17 @@ public class Airport {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name="name_airport", nullable = false)
     private String nameAirport;
 
-    @Column(nullable = false)
+    @Column(name="country_airport", nullable = false)
     private String countryAirport;
 
-    @Column(nullable = false)
+    @Column(name="city_airport", nullable = false)
     private String cityAirport;
+
+    @Column(name="code", nullable = false)
+    private String code;
 
     public Airport() {}
 
