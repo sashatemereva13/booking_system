@@ -28,15 +28,16 @@ public class PlaneService {
         return planeRepository.save(plane);
     }
 
-    public Plane updatePlane(Long id, Plane planeDetails) {
-        Plane plane = getPlaneById(id);
 
-        plane.setNamePlane(planeDetails.getNamePlane());
-        plane.setModel(planeDetails.getModel());
-        plane.setManufacturer(planeDetails.getManufacturer());
-        plane.setSeatCapacity(planeDetails.getSeatCapacity());
+    public Plane updatePlane(Long id, Plane plane) {
+        Plane existing = getPlaneById(id);
 
-        return planeRepository.save(plane);
+        existing.setModel(plane.getModel());
+        existing.setSeatsEconomy(plane.getSeatsEconomy());
+        existing.setSeatsBusiness(plane.getSeatsBusiness());
+        existing.setSeatsFirst(plane.getSeatsFirst());
+
+        return planeRepository.save(existing);
     }
 
     public void deletePlane(Long id) {
