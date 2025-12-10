@@ -21,8 +21,23 @@ public class PlaneController {
         return planeService.getAllPlanes();
     }
 
+    @GetMapping("/{id}")
+    public Plane getPlaneById(@PathVariable Long id) {
+        return planeService.getPlaneById(id);
+    }
+
     @PostMapping
     public Plane addPlane(@RequestBody Plane plane) {
         return planeService.createPlane(plane);
+    }
+
+    @PutMapping("/{id}")
+    public Plane updatePlane(@PathVariable Long id, @RequestBody Plane plane) {
+        return planeService.updatePlane(id, plane);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deletePlane(@PathVariable Long id) {
+        planeService.deletePlane(id);
     }
 }
