@@ -1,14 +1,12 @@
 package com.timeout.bookingsystem.services;
 
-import com.timeout.bookingsystem.models.*;
-import com.timeout.bookingsystem.repositories.SeatRepository;
+import com.timeout.bookingsystem.models.Plane;
+import com.timeout.bookingsystem.models.Seat;
 import com.timeout.bookingsystem.repositories.PlaneRepository;
-
+import com.timeout.bookingsystem.repositories.SeatRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-
 
 @Service
 public class SeatService {
@@ -21,61 +19,52 @@ public class SeatService {
         this.planeRepository = planeRepository;
     }
 
-    public List<Seat> getSeatsByPlane(Long planeId) {
-        Plane plane = planeRepository.findById(planeId).orElseThrow(() -> new RuntimeException("Plane not found"));
+    public List<Seat> getAllSeats() {
+        return seatRepository.findAll();
+    }
 
+    public Seat getSeatById(Long id) {
+        return seatRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Seat not found with id: " + id));
+    }
+
+    public Seat createSeat(Long planeId, Seat seat) {
+        Plane plane = planeRepository.findById(planeId)
+                .orElseThrow(() -> new RuntimeException("Plane not found with id: " + planeId));
+
+        seat.setPlane(plane);
+        return seatRepository.save(seat);
+    }
+
+    public Seat updateSeat(Long id, Seat seat) {
+        Seat existing = getSeatById(id);
+
+        existing.setSeatNumber(seat.getSeatNumber());
+        existing.setSeats(seat.getSeats());
+        existing.setOccupied(seat.isOccupied());
+
+        return seatRepository.save(existing);
+    }
+
+    public void deleteSeat(Long id) {
+        Seat seat = getSeatById(id);
+        seatRepository.delete(seat);
+    }
+    public List<Seat> getSeatsByPlane(Long planeId) {
+        Plane plane = planeRepository.findById(planeId)
+                .orElseThrow(() -> new RuntimeException("Plane not found with id: " + planeId));
         return seatRepository.findByPlane(plane);
     }
 
-    // generate seats automatically for a plane
-    public List<Seat> generateSeatsForPlane(Long planeId) {
-        Plane plane = planeRepository.findById(planeId).orElseThrow(() -> new RuntimeException("Plane not found"));
-
-        List<Seat> seats = new ArrayList<>();
-
-        //Economy
-        for (int i = 1; i <= plane.getSeatsEconomy(); i++) {
-            seats.add(new Seat("E" + i, Seats.ECONOMY, plane));
-        }
-
-        // Business
-        for (int i = 1; i <= plane.getSeatsBusiness(); i++) {
-            seats.add(new Seat("B" + i, Seats.BUSINESS, plane));
-        }
-
-        // First
-        for (int i = 1; i <= plane.getSeatsFirst(); i++) {
-            seats.add(new Seat("F" + i, Seats.FIRST, plane));
-        }
-
-        return seatRepository.saveAll(seats);
-    }
-
-    public Seat selectSeat(Long seatId) {
-        Seat seat = seatRepository.findById(seatId).orElseThrow(() -> new RuntimeException("Seat not found"));
-
-        if (seat.isOccupied()) {
-            throw new RuntimeException("Seat " + seat.getSeatNumber() + " is already occupied.");
-        }
-
-        seat.setOccupied(true);
-        return seatRepository.save(seat);
-    }
-
-    public Seat freeSeat(Long seatId) {
-        Seat seat = seatRepository.findById(seatId).orElseThrow(() -> new RuntimeException("Seat not found"));
-
-        seat.setOccupied(false);
-        return seatRepository.save(seat);
-    }
-
     public List<Seat> getAvailableSeats(Long planeId) {
-        Plane plane = planeRepository.findById(planeId).orElseThrow(() -> new RuntimeException("Plane not found"));
+        Plane plane = planeRepository.findById(planeId)
+                .orElseThrow(() -> new RuntimeException("Plane not found with id: " + planeId));
         return seatRepository.findByPlaneAndOccupiedFalse(plane);
     }
 
     public List<Seat> getOccupiedSeats(Long planeId) {
-        Plane plane = planeRepository.findById(planeId).orElseThrow(() -> new RuntimeException("Plane not found"));
+        Plane plane = planeRepository.findById(planeId)
+                .orElseThrow(() -> new RuntimeException("Plane not found with id: " + planeId));
         return seatRepository.findByPlaneAndOccupiedTrue(plane);
     }
 }
