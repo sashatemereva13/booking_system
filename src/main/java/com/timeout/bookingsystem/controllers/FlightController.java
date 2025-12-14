@@ -1,6 +1,7 @@
 package com.timeout.bookingsystem.controllers;
 
 import com.timeout.bookingsystem.dto.FlightSearchResponse;
+import com.timeout.bookingsystem.dto.FlightDetailsResponse;
 import com.timeout.bookingsystem.dto.SeatResponse;
 import com.timeout.bookingsystem.models.Flight;
 import com.timeout.bookingsystem.services.FlightService;
@@ -42,10 +43,10 @@ public class FlightController {
     }
 
     @GetMapping("/search")
-    public List<FlightSearchResponse> searchFlights(@RequestParam Long departureId,
-                                                    @RequestParam Long arrivalId,
+    public List<FlightSearchResponse> searchFlights(@RequestParam String departureCity,
+                                                    @RequestParam String arrivalCity,
                                                     @RequestParam(required = false) String date) {
-        return flightService.searchFlights(departureId, arrivalId,
+        return flightService.searchFlightsByCity(departureCity, arrivalCity,
                 date != null ? LocalDate.parse(date) : null);
     }
 
@@ -56,6 +57,11 @@ public class FlightController {
             @RequestParam(required = false) Boolean available
             ) {
         return flightService.getSeatsFiltered(id, seatClass, available);
+    }
+
+    @GetMapping("/{id}")
+    public FlightDetailsResponse getFlightDetails(@PathVariable Long id) {
+        return flightService.getFlightDetails(id);
     }
 
 }

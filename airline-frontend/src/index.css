@@ -1,0 +1,15 @@
+@import "tailwindcss";
+@import "./styles/fonts.css";
+
+/* define custom colors as theme variables */
+@theme {
+  --font-primary: "Chillax", sans-serif;
+  --font-display: "Telma", serif;
+
+  --color-dark: #0a1a2f; /* deepest navy – backgrounds */
+  --color-deep: #102a46; /* primary brand blue */
+  --color-brand: #1c3b5c; /* secondary rich blue */
+  --color-sunset: #4c6e91; /* softer blue for sections/cards */
+  --color-plum: #89a8c5; /* light blue highlights */
+  --color-gold: #d7c99e; /* optional premium accent */
+}

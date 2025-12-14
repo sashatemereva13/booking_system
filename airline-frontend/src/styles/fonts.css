@@ -1,0 +1,39 @@
+/* ---------------------------------------------------------
+   Custom Fonts for Airline Frontend
+   Tailwind v4 Compatible Font Setup
+----------------------------------------------------------*/
+
+/* -------------------------
+   CANOBIS (Regular)
+-------------------------- */
+@font-face {
+  font-family: "Canobis";
+  src: url("/public/fonts/Canobis-Regular.otf") format("opentype"),
+    url("/public/fonts/Canobis-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------------------------------------------------------
+   CHILLAX VARIABLE FONT (BEST PERFORMANCE)
+   This single file replaces all static weights.
+---------------------------------------------------------- */
+
+@font-face {
+  font-family: "Chillax";
+  src: url("/public/fonts/Chillax-Variable.woff2") format("woff2"),
+    url("/public/fonts/Chillax-Variable.woff") format("woff"),
+    url("/public/fonts/Chillax-Variable.ttf") format("truetype");
+  font-weight: 200 700; /* Range: ExtraLight → Bold */
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Telma";
+  src: url("/public/fonts/Telma-Variable.ttf") format("truetype");
+  font-weight: 300 700; /* Range: ExtraLight → Bold */
+  font-style: normal;
+  font-display: swap;
+}

@@ -1,0 +1,1 @@
+CREATE SEQUENCE IF NOT EXISTS flight_number_seq;
