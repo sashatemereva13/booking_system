@@ -42,6 +42,7 @@ public class Client {
     public void setEmail(String email) {this.email = email;}
 
     public Integer getMiles() {return miles;}
+    public void setMiles(Integer miles) { this.miles = miles; }
     public void addMiles(int m) {this.miles += m;}
 
 

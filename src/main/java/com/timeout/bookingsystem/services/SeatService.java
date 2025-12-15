@@ -1,14 +1,14 @@
 package com.timeout.bookingsystem.services;
 
-import com.timeout.bookingsystem.models.*;
-import com.timeout.bookingsystem.repositories.SeatRepository;
+import com.timeout.bookingsystem.models.Plane;
+import com.timeout.bookingsystem.models.Seat;
+import com.timeout.bookingsystem.models.Seats;
 import com.timeout.bookingsystem.repositories.PlaneRepository;
-
+import com.timeout.bookingsystem.repositories.SeatRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-
+import java.util.ArrayList;
 
 @Service
 public class SeatService {
@@ -21,9 +21,40 @@ public class SeatService {
         this.planeRepository = planeRepository;
     }
 
-    public List<Seat> getSeatsByPlane(Long planeId) {
-        Plane plane = planeRepository.findById(planeId).orElseThrow(() -> new RuntimeException("Plane not found"));
+    public List<Seat> getAllSeats() {
+        return seatRepository.findAll();
+    }
 
+    public Seat getSeatById(Long id) {
+        return seatRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Seat not found with id: " + id));
+    }
+
+    public Seat createSeat(Long planeId, Seat seat) {
+        Plane plane = planeRepository.findById(planeId)
+                .orElseThrow(() -> new RuntimeException("Plane not found with id: " + planeId));
+
+        seat.setPlane(plane);
+        return seatRepository.save(seat);
+    }
+
+    public Seat updateSeat(Long id, Seat seat) {
+        Seat existing = getSeatById(id);
+
+        existing.setSeatNumber(seat.getSeatNumber());
+        existing.setSeats(seat.getSeats());
+
+        return seatRepository.save(existing);
+    }
+
+    public void deleteSeat(Long id) {
+        Seat seat = getSeatById(id);
+        seatRepository.delete(seat);
+    }
+
+    public List<Seat> getSeatsByPlane(Long planeId) {
+        Plane plane = planeRepository.findById(planeId)
+                .orElseThrow(() -> new RuntimeException("Plane not found with id: " + planeId));
         return seatRepository.findByPlane(plane);
     }
 

@@ -19,7 +19,29 @@ public class PlaneService {
         return planeRepository.findAll();
     }
 
+    public Plane getPlaneById(Long id) {
+        return planeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Plane not found with id: " + id));
+    }
+
     public Plane createPlane(Plane plane) {
         return planeRepository.save(plane);
+    }
+
+
+    public Plane updatePlane(Long id, Plane plane) {
+        Plane existing = getPlaneById(id);
+
+        existing.setModel(plane.getModel());
+        existing.setSeatsEconomy(plane.getSeatsEconomy());
+        existing.setSeatsBusiness(plane.getSeatsBusiness());
+        existing.setSeatsFirst(plane.getSeatsFirst());
+
+        return planeRepository.save(existing);
+    }
+
+    public void deletePlane(Long id) {
+        Plane plane = getPlaneById(id);
+        planeRepository.delete(plane);
     }
 }

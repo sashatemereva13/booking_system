@@ -11,6 +11,7 @@ public class Seat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String seatNumber;
 
     @Enumerated(EnumType.STRING)
@@ -30,8 +31,10 @@ public class Seat {
         this.plane = plane;
 
     }
+    public Long getId() {
+        return id;
+    }
 
-    public Long getId() { return id;}
     public String getSeatNumber() { return seatNumber; }
     public Seats getSeats() { return seats; }
     public Plane getPlane() { return plane; }
