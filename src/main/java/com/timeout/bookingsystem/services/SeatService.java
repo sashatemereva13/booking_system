@@ -50,32 +50,4 @@ public class SeatService {
 
         return seatRepository.saveAll(seats);
     }
-
-    public Seat selectSeat(Long seatId) {
-        Seat seat = seatRepository.findById(seatId).orElseThrow(() -> new RuntimeException("Seat not found"));
-
-        if (seat.isOccupied()) {
-            throw new RuntimeException("Seat " + seat.getSeatNumber() + " is already occupied.");
-        }
-
-        seat.setOccupied(true);
-        return seatRepository.save(seat);
-    }
-
-    public Seat freeSeat(Long seatId) {
-        Seat seat = seatRepository.findById(seatId).orElseThrow(() -> new RuntimeException("Seat not found"));
-
-        seat.setOccupied(false);
-        return seatRepository.save(seat);
-    }
-
-    public List<Seat> getAvailableSeats(Long planeId) {
-        Plane plane = planeRepository.findById(planeId).orElseThrow(() -> new RuntimeException("Plane not found"));
-        return seatRepository.findByPlaneAndOccupiedFalse(plane);
-    }
-
-    public List<Seat> getOccupiedSeats(Long planeId) {
-        Plane plane = planeRepository.findById(planeId).orElseThrow(() -> new RuntimeException("Plane not found"));
-        return seatRepository.findByPlaneAndOccupiedTrue(plane);
-    }
 }

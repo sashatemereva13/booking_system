@@ -7,12 +7,14 @@ export default function MyTrips() {
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Mock upcoming trips (replace with backend later)
   useEffect(() => {
     async function loadTrips() {
       try {
-        const email = "sashatemereva13@gmail.com";
-        const res = await api.get(`/bookings?email=${email}`);
+        const email = localStorage.getItem("userEmail");
+
+        const res = await api.get(`/bookings/email`, {
+          params: { email },
+        });
         setTrips(res.data);
       } catch (e) {
         console.error(e);
@@ -97,7 +99,7 @@ export default function MyTrips() {
                     Price
                   </span>
                   <div className="font-[500] text-gold text-lg">
-                    {t.pricePaid}€
+                    {t.pricePaid.toFixed(2)}€
                   </div>
                 </div>
 

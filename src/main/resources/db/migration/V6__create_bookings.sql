@@ -13,6 +13,6 @@ booking_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 price_paid NUMERIC(10,2) DEFAULT 0,
 
 CONSTRAINT fk_booking_flight FOREIGN KEY (flight_id) REFERENCES flights(id),
-CONSTRAINT fk_booking_flight_seat FOREIGN KEY (flight_seat_id) REFERENCES seats(id)
+CONSTRAINT fk_booking_flight_seat FOREIGN KEY (flight_seat_id) REFERENCES flight_seats(id)
 
 );

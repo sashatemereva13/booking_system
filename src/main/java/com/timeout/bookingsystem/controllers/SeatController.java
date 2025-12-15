@@ -29,29 +29,4 @@ public class SeatController {
         return seatService.generateSeatsForPlane(planeId);
     }
 
-    @PostMapping("/{seatId}/select")
-    public Seat selectSeat(@PathVariable Long seatId) {
-        return seatService.selectSeat(seatId);
-    }
-
-    @PostMapping("/{seatId}/free")
-    public Seat freeSeat(@PathVariable Long seatId) {
-        return seatService.freeSeat(seatId);
-    }
-
-    @GetMapping("/plane/{planeId}/available")
-    public List<Seat> getAvailableSeats(@PathVariable Long planeId) {
-        return seatService.getAvailableSeats(planeId);
-    }
-
-    @GetMapping("/plane/{planeId}/occupied")
-    public List<Seat> getOccupiedSeats(@PathVariable Long planeId) {
-        return seatService.getOccupiedSeats(planeId);
-    }
-
-    @ExceptionHandler(SeatUnavailableException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleSeatUnavailable(SeatUnavailableException ex) {
-        return ex.getMessage();
-    }
 }

@@ -5,7 +5,7 @@ import Clouds from "../three/Clouds.jsx";
 import ParallaxCamera from "../three/ParallaxCamera.jsx";
 import PageTransition from "../components/PageTransition.jsx";
 import Earth from "../three/Earth.jsx";
-import AuroraSystem from "../three/aurora/AuroraSystem.jsx";
+import { NightSky } from "../three/aurora/NightSkyMaterial.jsx";
 
 export default function Home() {
   return (
@@ -32,7 +32,7 @@ p-16
 
             <Earth />
 
-            {/* <AuroraSystem /> */}
+            <NightSky />
 
             {/* <Clouds /> */}
             <Airplane />
