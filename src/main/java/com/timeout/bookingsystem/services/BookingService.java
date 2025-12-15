@@ -99,6 +99,8 @@ public class BookingService {
 
     private BookingResponse toResponse(Booking booking) {
 
+        Flight flight = booking.getFlight();
+
         // find client to read miles
         Client client = clientRepository.findByEmail(booking.getPassengerEmail())
                 .orElse(null);
@@ -107,10 +109,18 @@ public class BookingService {
 
         return new BookingResponse(
                 booking.getId(),
+
                 booking.getPassengerFirstName(),
                 booking.getPassengerLastName(),
                 booking.getPassengerEmail(),
-                booking.getFlight().getFlightNumber(),
+
+                flight.getId(),
+                flight.getFlightNumber(),
+
+                flight.getDepartureAirport().getCityAirport(),
+                flight.getArrivalAirport().getCityAirport(),
+                flight.getDepartureTime(),
+
                 booking.getSeat().getSeatNumber(),
                 booking.getPricePaid(),
                 miles

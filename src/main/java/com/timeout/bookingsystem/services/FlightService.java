@@ -1,5 +1,6 @@
 package com.timeout.bookingsystem.services;
 
+import com.timeout.bookingsystem.dto.FlightDetailsResponse;
 import com.timeout.bookingsystem.dto.FlightSearchResponse;
 import com.timeout.bookingsystem.dto.SeatResponse;
 import com.timeout.bookingsystem.models.*;
@@ -95,26 +96,50 @@ public class FlightService {
         return flightSeatRepository.saveAll(toSave);
     }
 
-    public List<FlightSearchResponse> searchFlights(Long depId, Long arrId, LocalDate date) {
+    public List<FlightSearchResponse> searchFlightsByCity(String departureCity, String arrivalCity, LocalDate date) {
 
-        Airport departure = airportRepository.findById(depId).orElseThrow(() -> new RuntimeException("Airport not found"));
+        List<Airport> departureAirports = airportRepository.findByCityAirportIgnoreCase(departureCity);
 
-        Airport arrival = airportRepository.findById(arrId).orElseThrow(() -> new RuntimeException("Airport not found"));
+        List<Airport> arrivalAirports = airportRepository.findByCityAirportIgnoreCase(arrivalCity);
+
+        if (departureAirports.isEmpty() || arrivalAirports.isEmpty()) {
+            return List.of();
+        }
+
+        List<FlightSearchResponse> results = new ArrayList<>();
+
+
+        for (Airport dep : departureAirports) {
+            for (Airport arr : arrivalAirports) {
+                results.addAll(
+                        searchFlights(dep, arr, date)
+                );
+            }
+        }
+
+        return results;
+    }
+
+
+    public List<FlightSearchResponse> searchFlights( Airport departure, Airport arrival, LocalDate date) {
 
         List<Flight> flights;
 
         if (date == null) {
-            flights = flightRepository.findByDepartureAirportAndArrivalAirport(departure, arrival);
+            flights = flightRepository
+                    .findByDepartureAirportAndArrivalAirport(departure, arrival);
         } else {
             LocalDateTime start = date.atStartOfDay();
             LocalDateTime end = date.plusDays(1).atStartOfDay();
 
-            flights = flightRepository.findByDepartureAirportAndArrivalAirportAndDepartureTimeBetween(
-                    departure, arrival, start, end
-            );
+            flights = flightRepository
+                    .findByDepartureAirportAndArrivalAirportAndDepartureTimeBetween(
+                            departure, arrival, start, end
+                    );
         }
 
-        return flights.stream().map(flight -> {
+
+    return flights.stream().map(flight -> {
 
             // make sure this flight has the FlightSeat rows
             List<FlightSeat> flightSeats = initSeatsForFlightIfNeeded(flight);
@@ -148,7 +173,50 @@ public class FlightService {
 
 
         }).toList();
-    }
+
+}
+
+
+public FlightDetailsResponse getFlightDetails(Long flightId) {
+
+        Flight flight = flightRepository.findById(flightId).orElseThrow(() -> new RuntimeException("Flight not found"));
+
+        // ensure seats exist
+    List<FlightSeat> seats = initSeatsForFlightIfNeeded(flight);
+
+    int eco = (int) seats.stream()
+            .filter(s -> s.getSeatClass() == Seats.ECONOMY && !s.isOccupied())
+            .count();
+
+    int bus = (int) seats.stream()
+            .filter(s -> s.getSeatClass() == Seats.BUSINESS && !s.isOccupied())
+            .count();
+
+    int fir = (int) seats.stream()
+            .filter(s -> s.getSeatClass() == Seats.FIRST && !s.isOccupied())
+            .count();
+
+    return new FlightDetailsResponse(
+            flight.getId(),
+
+            flight.getDepartureAirport().getCityAirport(),
+            flight.getArrivalAirport().getCityAirport(),
+
+            flight.getDepartureTime(),
+            flight.getArrivalTime(),
+
+            flight.getPlane().getModel(),
+
+            eco,
+            bus,
+            fir,
+
+            flight.getPriceEconomy(),
+            flight.getPriceBusiness(),
+            flight.getPriceFirst()
+    );
+}
+
 
     public Map<String, List<String>> getSeatsForFlight(Long flightId) {
         Flight flight = flightRepository.findById(flightId)
