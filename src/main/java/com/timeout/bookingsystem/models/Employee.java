@@ -22,16 +22,22 @@ public class Employee {
     @Column(name = "role", nullable = false)
     private String role;
 
+    // связь с User (простой и валидный вариант)
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
     public Employee() {}
 
     public Employee(String firstName,
                     String lastName,
                     String email,
-                    String role) {
+                    String role,
+                    Long userId) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.role = role;
+        this.userId = userId;
     }
 
     public Long getId() {
@@ -54,6 +60,10 @@ public class Employee {
         return role;
     }
 
+    public Long getUserId() {
+        return userId;
+    }
+
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -68,5 +78,9 @@ public class Employee {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

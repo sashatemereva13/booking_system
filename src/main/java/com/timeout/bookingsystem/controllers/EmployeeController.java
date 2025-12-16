@@ -2,6 +2,7 @@ package com.timeout.bookingsystem.controllers;
 
 import com.timeout.bookingsystem.models.Employee;
 import com.timeout.bookingsystem.repositories.EmployeeRepository;
+import com.timeout.bookingsystem.repositories.UserRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -14,11 +15,15 @@ import java.util.List;
 public class EmployeeController {
 
     private final EmployeeRepository employeeRepository;
+    private final UserRepository userRepository;
 
-    public EmployeeController(EmployeeRepository employeeRepository) {
+    public EmployeeController(EmployeeRepository employeeRepository,
+                              UserRepository userRepository) {
         this.employeeRepository = employeeRepository;
+        this.userRepository = userRepository;
     }
 
+    // GET ALL
     @GetMapping
     public List<Employee> getAllEmployees() {
         return employeeRepository.findAll();
@@ -38,9 +43,32 @@ public class EmployeeController {
             return employeeRepository.save(employee);
         } catch (DataIntegrityViolationException e) {
             throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Email already exists"
-            );
+                    HttpStatus.CONFLICT, "Email already exists");
+        }
+    }
+
+    @PostMapping("/from-user/{userId}")
+    public Employee createEmployeeFromUser(
+            @PathVariable Long userId,
+            @RequestBody Employee body
+    ) {
+        // проверяем, что User существует
+        userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "User not found"));
+
+        Employee e = new Employee();
+        e.setFirstName(body.getFirstName());
+        e.setLastName(body.getLastName());
+        e.setEmail(body.getEmail());
+        e.setRole(body.getRole());
+        e.setUserId(userId);
+
+        try {
+            return employeeRepository.save(e);
+        } catch (DataIntegrityViolationException ex) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "Email already exists");
         }
     }
 
@@ -61,9 +89,7 @@ public class EmployeeController {
             return employeeRepository.save(e);
         } catch (DataIntegrityViolationException ex) {
             throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Email already exists"
-            );
+                    HttpStatus.CONFLICT, "Email already exists");
         }
     }
 
