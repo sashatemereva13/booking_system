@@ -46,13 +46,10 @@ public class SeatController {
         return seatService.getSeatsByPlane(planeId);
     }
 
-    @GetMapping("/plane/{planeId}/available")
-    public List<Seat> getAvailableSeats(@PathVariable Long planeId) {
-        return seatService.getAvailableSeats(planeId);
+
+    @PostMapping("/generate/{planeId}")
+    public List<Seat> generateSeats(@PathVariable Long planeId) {
+        return seatService.generateSeatsForPlane(planeId);
     }
 
-    @GetMapping("/plane/{planeId}/occupied")
-    public List<Seat> getOccupiedSeats(@PathVariable Long planeId) {
-        return seatService.getOccupiedSeats(planeId);
-    }
 }

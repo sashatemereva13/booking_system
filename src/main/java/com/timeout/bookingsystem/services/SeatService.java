@@ -2,11 +2,13 @@ package com.timeout.bookingsystem.services;
 
 import com.timeout.bookingsystem.models.Plane;
 import com.timeout.bookingsystem.models.Seat;
+import com.timeout.bookingsystem.models.Seats;
 import com.timeout.bookingsystem.repositories.PlaneRepository;
 import com.timeout.bookingsystem.repositories.SeatRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.ArrayList;
 
 @Service
 public class SeatService {
@@ -41,7 +43,6 @@ public class SeatService {
 
         existing.setSeatNumber(seat.getSeatNumber());
         existing.setSeats(seat.getSeats());
-        existing.setOccupied(seat.isOccupied());
 
         return seatRepository.save(existing);
     }
@@ -50,21 +51,34 @@ public class SeatService {
         Seat seat = getSeatById(id);
         seatRepository.delete(seat);
     }
+
     public List<Seat> getSeatsByPlane(Long planeId) {
         Plane plane = planeRepository.findById(planeId)
                 .orElseThrow(() -> new RuntimeException("Plane not found with id: " + planeId));
         return seatRepository.findByPlane(plane);
     }
 
-    public List<Seat> getAvailableSeats(Long planeId) {
-        Plane plane = planeRepository.findById(planeId)
-                .orElseThrow(() -> new RuntimeException("Plane not found with id: " + planeId));
-        return seatRepository.findByPlaneAndOccupiedFalse(plane);
-    }
+    // generate seats automatically for a plane
+    public List<Seat> generateSeatsForPlane(Long planeId) {
+        Plane plane = planeRepository.findById(planeId).orElseThrow(() -> new RuntimeException("Plane not found"));
 
-    public List<Seat> getOccupiedSeats(Long planeId) {
-        Plane plane = planeRepository.findById(planeId)
-                .orElseThrow(() -> new RuntimeException("Plane not found with id: " + planeId));
-        return seatRepository.findByPlaneAndOccupiedTrue(plane);
+        List<Seat> seats = new ArrayList<>();
+
+        //Economy
+        for (int i = 1; i <= plane.getSeatsEconomy(); i++) {
+            seats.add(new Seat("E" + i, Seats.ECONOMY, plane));
+        }
+
+        // Business
+        for (int i = 1; i <= plane.getSeatsBusiness(); i++) {
+            seats.add(new Seat("B" + i, Seats.BUSINESS, plane));
+        }
+
+        // First
+        for (int i = 1; i <= plane.getSeatsFirst(); i++) {
+            seats.add(new Seat("F" + i, Seats.FIRST, plane));
+        }
+
+        return seatRepository.saveAll(seats);
     }
 }

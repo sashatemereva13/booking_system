@@ -9,8 +9,8 @@ export default function Clouds() {
         speed={0.2} // drift speed
         width={4} // cloud width
         depth={1.5} // cloud volume
-        segments={20}
-        position={[-4, 2, -5]}
+        segments={10}
+        position={[0, 2.5, -5]}
         color="#89A8C5"
       />
 
@@ -20,8 +20,8 @@ export default function Clouds() {
         speed={0.15}
         width={4}
         depth={1.2}
-        segments={18}
-        position={[3, 1.5, -4]}
+        segments={10}
+        position={[-4, 2, -4]}
         color="#4C6E91"
       />
 
@@ -31,8 +31,8 @@ export default function Clouds() {
         speed={0.1}
         width={5}
         depth={1.5}
-        segments={14}
-        position={[0, 3, -6]}
+        segments={8}
+        position={[4, 2, 0]}
         color="#A7BED3"
       />
     </>

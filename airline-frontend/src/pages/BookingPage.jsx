@@ -16,35 +16,56 @@ export default function BookingPage() {
 
   // ---- Mock seats (replace with backend later) ----
   useEffect(() => {
-    setTimeout(() => {
-      setAvailableSeats([
-        { id: 1, seat: "12A", price: 220 },
-        { id: 2, seat: "14C", price: 220 },
-        { id: 3, seat: "3B", price: 480 },
-      ]);
-      setLoading(false);
-    }, 400);
+    async function loadSeats() {
+      try {
+        const res = await api.get(`/flights/${id}/seats/filter`, {
+          params: { available: true },
+        });
+        setAvailableSeats(res.data);
+      } catch (e) {
+        console.error(e);
+        setAvailableSeats([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadSeats();
   }, [id]);
 
   async function handleBooking() {
     if (!name || !email || !seatId) return alert("Please fill all fields");
 
-    // await api.post("/bookings/create", { flightId: id, seatId, name, email });
+    const [firstName, lastName = ""] = name.split(" ");
 
-    setSuccess(true);
-    setTimeout(() => navigate("/my-trips"), 1700);
+    try {
+      await api.post("/bookings/create", null, {
+        params: {
+          flightId: id,
+          seatId,
+          passengerFirstName: firstName,
+          passengerLastName: lastName,
+          email,
+        },
+      });
+
+      setSuccess(true);
+      setTimeout(() => navigate("/my-trips"), 1700);
+    } catch (e) {
+      console.error(e);
+      alert("Error creating booking");
+    }
   }
 
   if (loading)
     return (
-      <div className="min-h-screen flex items-center justify-center bg-dark text-gold text-xl font-primary">
+      <div className="h-screen flex items-center justify-center bg-dark text-gold text-xl font-primary">
         Loading seats…
       </div>
     );
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-dark text-plum font-primary flex justify-center items-center p-6 relative overflow-hidden">
+      <div className="h-screen flex justify-center p-6 bg-dark text-plum font-primary overflow-hidden">
         {/* Background glow accents */}
         <div className="absolute w-[450px] h-[450px] bg-brand/25 blur-[180px] -top-24 -left-24 rounded-full"></div>
         <div className="absolute w-[380px] h-[380px] bg-deep/30 blur-[160px] bottom-10 right-10 rounded-full"></div>
@@ -54,21 +75,23 @@ export default function BookingPage() {
           className="
           relative z-10
           w-full max-w-xl 
+          max-h-[80vh]
           bg-brand/20 backdrop-blur-xl
           border border-plum/20
-          rounded-2xl p-10
+          rounded-2xl
           shadow-[0_10px_40px_rgba(0,0,0,0.4)]
+          flex flex-col
         "
         >
           {/* Title */}
-          <h1 className="font-display text-center text-3xl md:text-4xl text-gold tracking-wide mb-8">
+          <h1 className="px-10 pt-10 pb-6 font-display text-center text-3xl md:text-4xl text-gold tracking-wide">
             Book Flight <span className="text-plum">#{id}</span>
           </h1>
 
           {/* FORM */}
-          <div className="flex flex-col gap-5 text-lg">
+          <div className="flex-1 overflow-y-auto p-5">
             {/* Name */}
-            <div className="flex flex-col text-left">
+            <div className="flex flex-col gap-5 text-lg">
               <label className="text-plum/70 mb-1 text-sm tracking-wide">
                 Full Name
               </label>
@@ -121,34 +144,34 @@ export default function BookingPage() {
                     }
                   `}
                   >
-                    {s.seat} — {s.price}€
+                    {s.seatNumber} ({s.seatClass}) — {s.price.toFixed(2)}€
                   </button>
                 ))}
               </div>
             </div>
+          </div>
 
-            {/* Confirm Button */}
+          <div className="px-10 pb-8 pt-4 border-t border-plum/20">
             <button
               onClick={handleBooking}
               className="
-              mt-6 bg-brand text-plum 
-              py-3 rounded-xl text-xl font-[450]
-              hover:bg-plum hover:text-dark
-              transition-all duration-300 w-full
-              shadow-[0_0_20px_rgba(28,59,92,0.3)]
-              hover:shadow-[0_0_35px_rgba(213,201,158,0.35)]
-            "
+      w-full bg-brand text-plum 
+      py-3 rounded-xl text-xl font-[450]
+      hover:bg-plum hover:text-dark
+      transition-all duration-300
+      shadow-[0_0_20px_rgba(28,59,92,0.3)]
+      hover:shadow-[0_0_35px_rgba(213,201,158,0.35)]
+    "
             >
               Confirm Booking
             </button>
-          </div>
 
-          {/* Success Message */}
-          {success && (
-            <div className="text-gold font-semibold text-center mt-6 animate-pulse">
-              Booking Confirmed! ✈ Redirecting…
-            </div>
-          )}
+            {success && (
+              <div className="text-gold font-semibold text-center mt-4 animate-pulse">
+                Booking Confirmed! ✈ Redirecting…
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </PageTransition>

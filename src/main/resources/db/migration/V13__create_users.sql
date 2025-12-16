@@ -5,5 +5,6 @@ CREATE TABLE users (
                        address VARCHAR(255),
                        email VARCHAR(150) UNIQUE NOT NULL,
                        phone VARCHAR(50),
-                       birthdate DATE
+                       birthdate DATE,
+                       password VARCHAR(255) NOT NULL
 );

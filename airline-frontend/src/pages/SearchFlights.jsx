@@ -175,7 +175,7 @@ export default function SearchFlights() {
                   </div>
 
                   <div className="text-gold font-semibold">
-                    Economy from €{f.priceEconomy}
+                    Economy from €{f.priceEconomy.toFixed(2)}
                   </div>
 
                   <a

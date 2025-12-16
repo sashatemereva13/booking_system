@@ -52,7 +52,7 @@ export default function FlightDetails() {
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-dark text-white flex justify-center py-16 px-4">
+      <div className="h-screen bg-dark text-white flex justify-center py-3 px-4">
         <div className="w-full max-w-3xl bg-deep rounded-2xl p-10 shadow-2xl border border-gold/25">
           {/* Header */}
           <h1 className="text-5xl font-bold text-center mb-2 tracking-wide text-gold">
@@ -91,21 +91,24 @@ export default function FlightDetails() {
               <div className="flex justify-between">
                 <span>Economy</span>
                 <span className="text-gold">
-                  {flight.economySeatsLeft} seats · €{flight.priceEconomy}
+                  {flight.economySeatsLeft} seats · €
+                  {flight.priceEconomy.toFixed(2)}
                 </span>
               </div>
 
               <div className="flex justify-between">
                 <span>Business</span>
                 <span className="text-gold">
-                  {flight.businessSeatsLeft} seats · €{flight.priceBusiness}
+                  {flight.businessSeatsLeft} seats · €
+                  {flight.priceBusiness.toFixed(2)}
                 </span>
               </div>
 
               <div className="flex justify-between">
                 <span>First</span>
                 <span className="text-gold">
-                  {flight.firstSeatsLeft} seats · €{flight.priceFirst}
+                  {flight.firstSeatsLeft} seats · €
+                  {flight.priceFirst.toFixed(2)}
                 </span>
               </div>
             </div>
