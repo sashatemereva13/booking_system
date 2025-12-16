@@ -22,23 +22,11 @@ public class Employee {
     @Column(name = "role", nullable = false)
     private String role;
 
-    // связь с User (простой и валидный вариант)
+    // 👇 ВАЖНО
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
     public Employee() {}
-
-    public Employee(String firstName,
-                    String lastName,
-                    String email,
-                    String role,
-                    Long userId) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.role = role;
-        this.userId = userId;
-    }
 
     public Long getId() {
         return id;
