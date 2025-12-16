@@ -11,23 +11,26 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "firstname", nullable = false)
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "lastname", nullable = false)
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(name = "address", nullable = false)
+    @Column(name = "address")
     private String address;
 
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "phone", nullable = false)
+    @Column(name = "phone")
     private String phone;
 
-    @Column(name = "birthdate", nullable = false)
+    @Column(name = "birthdate")
     private LocalDate birthdate;
+
+    @Column(name= "password", nullable = false)
+    private String password;
 
     public User() {}
 
@@ -36,13 +39,15 @@ public class User {
                 String address,
                 String email,
                 String phone,
-                LocalDate birthdate) {
+                LocalDate birthdate,
+                String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;
         this.email = email;
         this.phone = phone;
         this.birthdate = birthdate;
+        this.password = password;
     }
 
     public Long getId() {
@@ -74,6 +79,8 @@ public class User {
         return birthdate;
     }
 
+    public String getPassword() { return password; }
+
     // setters
     public void setFirstName(String firstName) {
         this.firstName = firstName;
@@ -98,4 +105,6 @@ public class User {
     public void setBirthdate(LocalDate birthdate) {
         this.birthdate = birthdate;
     }
+
+    public void setPassword(String password) { this.password = password; }
 }
