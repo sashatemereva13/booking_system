@@ -30,7 +30,7 @@ export default function Airplane(props) {
     if (!planeRef.current) return;
 
     /* ── PLANE ANIMATION ───────────────────── */
-    planeRef.current.position.lerp(cruisePos, 0.005);
+    planeRef.current.position.lerp(cruisePos, 0.05);
     planeRef.current.scale.lerp(new THREE.Vector3(0.5, 0.5, 0.5), 0.03);
 
     planeRef.current.rotation.x = THREE.MathUtils.lerp(

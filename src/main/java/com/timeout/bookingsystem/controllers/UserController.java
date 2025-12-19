@@ -3,6 +3,8 @@ package com.timeout.bookingsystem.controllers;
 import com.timeout.bookingsystem.models.User;
 import com.timeout.bookingsystem.services.UserService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 
@@ -39,5 +41,13 @@ public class UserController {
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
+    }
+
+    @GetMapping("/me")
+    public User getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName(); // email or username from JWT
+
+        return userService.getUserByEmail(email);
     }
 }

@@ -7,6 +7,5 @@ import java.util.List;
 
 public interface AirportRepository extends JpaRepository<Airport, Long>{
 
-
     List<Airport> findByCityAirportIgnoreCase(String cityAirport);
 }

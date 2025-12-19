@@ -12,7 +12,7 @@ export default function MyTrips() {
       try {
         const email = localStorage.getItem("userEmail");
 
-        const res = await api.get(`/bookings/email`, {
+        const res = await api.get(`/bookings/my`, {
           params: { email },
         });
         setTrips(res.data);

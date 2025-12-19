@@ -1,5 +1,8 @@
 package com.timeout.bookingsystem.controllers;
 
+import com.timeout.bookingsystem.repositories.ClientRepository;
+import com.timeout.bookingsystem.models.Client;
+
 import com.timeout.bookingsystem.dto.BookingResponse;
 import com.timeout.bookingsystem.exceptions.SeatUnavailableException;
 import com.timeout.bookingsystem.models.Booking;
@@ -17,9 +20,12 @@ import java.util.List;
 public class BookingController {
 
     private final BookingService bookingService;
+    private final ClientRepository clientRepository;
 
-    public BookingController(BookingService bookingService) {
+
+    public BookingController(BookingService bookingService, ClientRepository clientRepository) {
         this.bookingService = bookingService;
+        this.clientRepository = clientRepository;
     }
 
     @PostMapping("/create")
@@ -27,11 +33,18 @@ public class BookingController {
             @RequestParam Long flightId,
             @RequestParam Long seatId,
             @RequestParam String passengerFirstName,
-            @RequestParam String passengerLastName,
-            @RequestParam String email
+            @RequestParam String passengerLastName
     ) {
-        return bookingService.createBooking(flightId, seatId, passengerFirstName, passengerLastName, email);
+        String email = org.springframework.security.core.context.SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        return bookingService.createBooking(
+                flightId, seatId, passengerFirstName, passengerLastName, email
+        );
     }
+
 
     @ExceptionHandler(SeatUnavailableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -45,10 +58,16 @@ public class BookingController {
         return "Booking has been cancelled. The seat is now free.";
     }
 
-    @GetMapping("/email")
-    public List<BookingResponse> getBookingByEmail(@RequestParam String email) {
+    @GetMapping("/my")
+    public List<BookingResponse> getMyBookings() {
+        String email = org.springframework.security.core.context.SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
         return bookingService.getBookingsByEmailResponse(email);
     }
+
 
     @GetMapping
     List<BookingResponse> getAllBookings() {
@@ -61,9 +80,22 @@ public class BookingController {
     }
 
     @GetMapping("/clients/miles")
-    public int getMiles(@RequestParam String email) {
+    public int getMiles() {
+        String email = org.springframework.security.core.context.SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
         return bookingService.getMilesByEmail(email);
     }
+
+    @GetMapping("/clients/{id}/miles")
+    public int getClientMiles(@PathVariable Long id) {
+        return clientRepository.findById(id)
+                .map(Client::getMiles)
+                .orElse(0);
+    }
+
 
 
 

@@ -18,6 +18,11 @@ import { useAuth } from "./auth/AuthContext.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 import AdminPlanes from "./pages/admin/AdminPlanes.jsx";
 import Profile from "./pages/Profile.jsx";
+import AdminAirports from "./pages/admin/AdminAirports.jsx";
+import AdminClients from "./pages/admin/AdminClients.jsx";
+import AdminEmployees from "./pages/admin/AdminEmployees.jsx";
+import AdminFlights from "./pages/admin/AdminFlights.jsx";
+import AdminUsers from "./pages/admin/AdminUsers.jsx";
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -58,9 +63,54 @@ function AnimatedRoutes() {
 
         <Route
           path="/admin/planes"
-          elenebt={
+          element={
             <ProtectedRoute>
               <AdminPlanes />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/airports"
+          element={
+            <ProtectedRoute>
+              <AdminAirports />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/clients"
+          element={
+            <ProtectedRoute>
+              <AdminClients />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/employees"
+          element={
+            <ProtectedRoute>
+              <AdminEmployees />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/flights"
+          element={
+            <ProtectedRoute>
+              <AdminFlights />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/users"
+          element={
+            <ProtectedRoute>
+              <AdminUsers />
             </ProtectedRoute>
           }
         />

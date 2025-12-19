@@ -22,6 +22,7 @@ public class Plane {
     public Plane() {}
 
     @OneToMany(mappedBy = "plane", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Seat> seats;
 
     public Plane(String model, Integer seatsEconomy, Integer seatsBusiness, Integer seatsFirst) {

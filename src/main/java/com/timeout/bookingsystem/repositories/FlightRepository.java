@@ -21,4 +21,6 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
             LocalDateTime end
     );
 
+    boolean existsByPlaneId(Long planeId);
+
 }

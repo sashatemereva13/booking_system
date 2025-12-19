@@ -2,6 +2,7 @@ package com.timeout.bookingsystem.services;
 
 import com.timeout.bookingsystem.models.Plane;
 import com.timeout.bookingsystem.repositories.PlaneRepository;
+import com.timeout.bookingsystem.repositories.FlightRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,9 +11,14 @@ import java.util.List;
 public class PlaneService {
 
     private final PlaneRepository planeRepository;
+    private final FlightRepository flightRepository;
 
-    public PlaneService(PlaneRepository planeRepository) {
+    public PlaneService(
+            PlaneRepository planeRepository,
+            FlightRepository flightRepository
+    ) {
         this.planeRepository = planeRepository;
+        this.flightRepository = flightRepository;
     }
 
     public List<Plane> getAllPlanes() {
@@ -21,13 +27,14 @@ public class PlaneService {
 
     public Plane getPlaneById(Long id) {
         return planeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Plane not found with id: " + id));
+                .orElseThrow(() ->
+                        new RuntimeException("Plane not found with id: " + id)
+                );
     }
 
     public Plane createPlane(Plane plane) {
         return planeRepository.save(plane);
     }
-
 
     public Plane updatePlane(Long id, Plane plane) {
         Plane existing = getPlaneById(id);
@@ -42,6 +49,14 @@ public class PlaneService {
 
     public void deletePlane(Long id) {
         Plane plane = getPlaneById(id);
+
+        if (flightRepository.existsByPlaneId(id)) {
+            throw new IllegalStateException(
+                    "Cannot delete plane: it is used by existing flights"
+            );
+        }
+
         planeRepository.delete(plane);
     }
 }
+

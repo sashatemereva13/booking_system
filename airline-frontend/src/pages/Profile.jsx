@@ -5,25 +5,18 @@ import PageTransition from "../components/PageTransition";
 export default function Profile() {
   const [user, setUser] = useState(null);
   const [client, setClient] = useState(null);
-  const [reward, setReward] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadProfile() {
       try {
-        // 1️⃣ User
         const userRes = await api.get("/users/me");
         setUser(userRes.data);
 
-        // 2️⃣ Client
-        const clientRes = await api.get(`/clients/user/${userRes.data.id}`);
+        const clientRes = await api.get(`/clients/email/${userRes.data.email}`);
         setClient(clientRes.data);
-
-        // 3️⃣ Miles / Rewards
-        const milesRes = await api.get(`/miles/${clientRes.data.id}`);
-        setReward(milesRes.data);
       } catch (e) {
-        console.error(e);
+        console.error("Failed to load profile", e);
       } finally {
         setLoading(false);
       }
@@ -52,9 +45,8 @@ export default function Profile() {
           {user && (
             <div className="bg-brand/20 p-8 rounded-2xl border border-plum/20">
               <h2 className="text-2xl text-gold mb-4">Personal Information</h2>
-
               <p>
-                <b>Name:</b> {user.firstname} {user.lastname}
+                <b>Name:</b> {user.firstName} {user.lastName}
               </p>
               <p>
                 <b>Email:</b> {user.email}
@@ -62,39 +54,18 @@ export default function Profile() {
             </div>
           )}
 
-          {/* CLIENT INFO */}
+          {/* CLIENT / MILES */}
           {client && (
-            <div className="bg-brand/20 p-8 rounded-2xl border border-plum/20">
-              <h2 className="text-2xl text-gold mb-4">Client Details</h2>
-
-              <p>
-                <b>Passport Number:</b> {client.passportNumber}
-              </p>
-              <p>
-                <b>Client ID:</b> {client.id}
-              </p>
-            </div>
-          )}
-
-          {/* MILES & REWARDS */}
-          {reward && (
             <div className="bg-brand/20 p-8 rounded-2xl border border-plum/20 text-center">
-              <h2 className="text-2xl text-gold mb-4">Miles & Rewards ✨</h2>
+              <h2 className="text-2xl text-gold mb-4">Miles ✨</h2>
 
               <p className="text-lg">
-                Flights this year: <b>{reward.totalFlightsThisYear}</b>
+                Total miles earned: <b>{client.miles}</b>
               </p>
 
-              {reward.discountCode ? (
-                <p className="mt-4 text-gold text-xl font-semibold">
-                  🎁 Your discount code: {reward.discountCode}
-                </p>
-              ) : (
-                <p className="mt-4 text-plum/70">
-                  {3 - reward.totalFlightsThisYear} more flight(s) to unlock a
-                  discount
-                </p>
-              )}
+              <p className="mt-4 text-plum/70">
+                Keep flying to earn more miles.
+              </p>
             </div>
           )}
         </div>
